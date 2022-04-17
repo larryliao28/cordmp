@@ -1,5 +1,7 @@
 #include "cord.hpp"
 
+#include <stdexcept>
+
 #include "cord-utilities.hpp"
 
 Cord::Cord(const std::string& dat) {
@@ -12,7 +14,14 @@ Cord::Cord(const std::shared_ptr<Cord>& left_cord,
   // TODO
   left_ = left_cord;
   right_ = right_cord;
-  length_ = left_cord->length_ + right_cord->length_;
+  size_t length = 0;
+  if (left_cord != nullptr) {
+    length += left_cord->length_;
+  }
+  if (right_cord != nullptr) {
+    length += right_cord->length_;
+  }
+  length_ = length;
 }
 
 size_t Cord::Length() const { return length_; }
@@ -25,23 +34,41 @@ const std::string& Cord::GetData() const { return data_; }
 
 std::string Cord::ToString() const {
   // TODO
-  // std::string str = "";
-  // if (left_ == nullptr) {
-  //   left_ ->
-  // }
-  // left_ -> ToString();
-  // right_ -> ToString();
-
-  // return "";
+  std::string str;
+  if (left_ != nullptr) {
+    str += left_->ToString();
+  }
+  if (right_ != nullptr) {
+    str += right_->ToString();
+  }
+  str += data_;
+  return str;
 }
 
 std::shared_ptr<Cord> Cord::SubString(size_t lower_idx, size_t upper_idx) {
   // TODO
+  std::string str = this->ToString().substr(lower_idx, upper_idx);
+  if (left_ == nullptr && right_ == nullptr) {
+    // return new std::make_shared<Cord>(str);
+  }
   return nullptr;
 }
 
 char Cord::At(size_t idx) const {
   // TODO
+  if (idx >= length_ || idx < 0) {
+    throw std::runtime_error("invalid input");
+  }
+  if (left_ == nullptr && right_ == nullptr) {
+    return data_.at(idx);
+  }
+  if (left_ != nullptr && idx < left_->length_) {
+    return left_->At(idx);
+  }
+  // if (right_ != nullptr) {
+  //   if (idx >= left)
+
+  // }
 }
 
 bool Cord::IsValidCord() const {
