@@ -48,10 +48,29 @@ std::string Cord::ToString() const {
 std::shared_ptr<Cord> Cord::SubString(size_t lower_idx, size_t upper_idx) {
   // TODO
   std::string str = this->ToString().substr(lower_idx, upper_idx);
+  // leaf node
   if (left_ == nullptr && right_ == nullptr) {
-    // return new std::make_shared<Cord>(str);
+    std::shared_ptr<Cord> to_return = std::make_shared<Cord>(str);
+    return to_return;
   }
-  return nullptr;
+  if (left_ != nullptr && right_ == nullptr) {
+    return left_->SubString(lower_idx, upper_idx);
+  }
+  if (left_ == nullptr && right_ != nullptr) {
+    return right_->SubString(lower_idx, upper_idx);
+  }
+  if (lower_idx >= left_->length_) {
+    return right_->SubString(lower_idx - left_->length_,
+                             upper_idx - left_->length_);
+  }
+  if (upper_idx <= left_->length_) {
+    return left_->SubString(lower_idx, upper_idx);
+  }
+  std::shared_ptr<Cord> concat = new std::make_shared<Cord>(
+      left_->SubString(lower_idx, left_->length_),
+      right_->SubString(0, upper_idx - left_->length_));
+
+  return concat;
 }
 
 char Cord::At(size_t idx) const {
