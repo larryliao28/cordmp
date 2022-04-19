@@ -48,6 +48,7 @@ std::string Cord::ToString() const {
 std::shared_ptr<Cord> Cord::SubString(size_t lower_idx, size_t upper_idx) {
   // TODO
   std::string str = this->ToString().substr(lower_idx, upper_idx);
+
   // leaf node
   if (left_ == nullptr && right_ == nullptr) {
     std::shared_ptr<Cord> to_return = std::make_shared<Cord>(str);
@@ -66,9 +67,9 @@ std::shared_ptr<Cord> Cord::SubString(size_t lower_idx, size_t upper_idx) {
   if (upper_idx <= left_->length_) {
     return left_->SubString(lower_idx, upper_idx);
   }
-  std::shared_ptr<Cord> concat = new std::make_shared<Cord>(
-      left_->SubString(lower_idx, left_->length_),
-      right_->SubString(0, upper_idx - left_->length_));
+  std::shared_ptr<Cord> concat =
+      std::make_shared<Cord>(left_->SubString(lower_idx, left_->length_),
+                             right_->SubString(0, upper_idx - left_->length_));
 
   return concat;
 }
@@ -84,13 +85,37 @@ char Cord::At(size_t idx) const {
   if (left_ != nullptr && idx < left_->length_) {
     return left_->At(idx);
   }
-  // if (right_ != nullptr) {
-  //   if (idx >= left)
-
-  // }
+  if (left_ != nullptr) {
+    if (right_ != nullptr && idx >= left_->length_) {
+      return right_->At(idx - (left_->length_));
+    }
+  } else {
+    if (right_ != nullptr && idx >= 0) {
+      return right_->At(idx);
+    }
+  }
+  return '?';
 }
 
 bool Cord::IsValidCord() const {
   // TODO
+
   return false;
+}
+
+std::shared_ptr<Cord> Cord::RuduceHelp(
+    std::map<std::string, std::shared_ptr<Cord>>& data_string) {
+  if (data_string.find(this->ToString()) != data_string.end()) {
+    return data_string.at(ToString());
+  }
+  if (left_ != nullptr) {
+    left_ = left_->RuduceHelp(data_string);
+  }
+  if (right_ != nullptr) {
+    right_ = right_->RuduceHelp(data_string);
+  }
+  data_string.insert(
+      std::pair<std::string, std::shared_ptr<Cord>>(ToString(), this));
+
+  return this->shared_from_this();
 }

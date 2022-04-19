@@ -36,6 +36,10 @@ public:
                                            std::shared_ptr<Cord> right_cord);
   friend void ReduceCords(cs128::ReferenceList<std::shared_ptr<Cord>> cords);
 
+  // helper function
+  std::shared_ptr<Cord> RuduceHelp(
+      std::map<std::string, std::shared_ptr<Cord>>& data_string);
+
 private:
   std::shared_ptr<Cord> left_ = nullptr;
   std::shared_ptr<Cord> right_ = nullptr;
